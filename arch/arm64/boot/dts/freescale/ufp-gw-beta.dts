@@ -1,0 +1,56 @@
+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
+/*
+ * Copyright 2022 Prometheus Security Group
+ */
+
+/dts-v1/;
+
+#include "imx8mm.dtsi"
+#include "imx8mm-beacon-som.dtsi"
+#include "psgg-imx8mm-baseboard.dtsi"
+
+/ {
+	model = "PSGG UFP Beta Gateway";
+	compatible = "fsl,imx8mm";
+
+	chosen {
+		stdout-path = &uart3;
+	};
+};
+
+&uart1 {
+        rts-gpios = <&gpio4 19 GPIO_ACTIVE_HIGH>;
+};
+
+&uart4 {
+	status = "disabled";
+};
+
+/* Override since GW baseboard uses different clock request */
+&iomuxc {
+        pinctrl_pcie0: pcie0grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO05_GPIO1_IO5       0x41
+			MX8MM_IOMUXC_SAI2_RXFS_GPIO4_IO21       0x41
+			MX8MM_IOMUXC_I2C4_SCL_PCIE1_CLKREQ_B    0x76
+		>;
+	};
+
+	pinctrl_hog: hoggrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SAI1_TXD5_GPIO4_IO17	0x41
+		>;
+	};
+};
+
+&gpio4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
+	xcvr-uart-pd-on {
+		gpio-hog;
+		gpios = <17 GPIO_ACTIVE_HIGH>;
+		output-low;
+	};
+};
+
